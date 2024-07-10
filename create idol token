@@ -1,0 +1,61 @@
+// SPDX-License-Identifier: Apache-2.0
+
+// Import necessary libraries
+use solana_program::{
+    account_info::{next_account_info, AccountInfo},
+    entrypoint,
+    entrypoint::ProgramResult,
+    msg,
+    program_error::ProgramError,
+    pubkey::Pubkey,
+};
+
+// Program entry point
+entrypoint!(process_instruction);
+
+// Process transaction
+fn process_instruction(
+    program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    _instruction_data: &[u8],
+) -> ProgramResult {
+    // Accounts[0] should be the token issuer's account
+    let accounts_iter = &mut accounts.iter();
+    let issuer_account = next_account_info(accounts_iter)?;
+
+    // Logic to process transactions (send/receive Idol Coin)
+    // Implement 2% fee deduction here
+
+    Ok(())
+}
+fn process_instruction(
+    program_id: &Pubkey,
+    accounts: &[AccountInfo],
+    instruction_data: &[u8],
+) -> ProgramResult {
+    // Extract necessary accounts
+    let accounts_iter = &mut accounts.iter();
+    let sender_account = next_account_info(accounts_iter)?;
+    let receiver_account = next_account_info(accounts_iter)?;
+
+    // Parse instruction_data to get transaction amount
+    let amount = parse_amount(instruction_data)?;
+
+    // Calculate fee (2% of amount)
+    let fee = amount * 2 / 100;
+    let net_amount = amount - fee;
+
+    // Logic to transfer tokens
+    transfer_tokens(sender_account, receiver_account, net_amount)?;
+
+    // Deduct fee (transfer to issuer's account or burn)
+    deduct_fee(issuer_account, fee)?;
+
+    Ok(())
+}
+fn deduct_fee(issuer_account: &AccountInfo, fee: u64) -> ProgramResult {
+    // Implement transfer or burn logic for the fee
+    // Example:
+    // Move fee amount from sender to issuer or burn
+    Ok(())
+}
